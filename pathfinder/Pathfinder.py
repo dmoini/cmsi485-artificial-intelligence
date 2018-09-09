@@ -11,8 +11,8 @@ from MazeProblem import MazeProblem
 from SearchTreeNode import SearchTreeNode
 import unittest
 
-class Pathfinder:
 
+class Pathfinder:
     # solve is parameterized by a maze pathfinding problem
     # (see MazeProblem.py and unit tests below), and will
     # return a list of actions that solves that problem. An
@@ -20,7 +20,11 @@ class Pathfinder:
     # ["U", "R", "R", "U"]
     def solve(problem):
         # TODO: Implement breadth first tree search!
+        frontier = []
+        graveyard = set
+        path = {}
         return []
+
 
 class PathfinderTests(unittest.TestCase):
     def test_maze1(self):
