@@ -43,8 +43,9 @@ For example, if an agent is at state (1, 1), and can only move right and down,
 then the transitions for that s = (1, 1) would be:
 [("R", (2, 1)), ("D", (1, 2))]
 '''
-class MazeProblem:
 
+
+class MazeProblem:
     # MazeProblem Constructor:
     # Constructs a new pathfinding problem from a maze, described above
     def __init__(self, maze):
@@ -64,28 +65,24 @@ class MazeProblem:
     # goalTest is parameterized by a state, and
     # returns True if the given state is a goal, False otherwise
     def goalTest(self, state):
-        x, y = state
-        return self.maze[y][x] == "G"
+        # x, y = state
+        return self.maze[state[1]][state[0]] == "G"
 
     # returns dictionary where:
     # key is a string of format "DIRECTION"
     # value is tuple of format (x, y)
     # each tuple is an available movement from the given state
     def possible_states(self, s):
-        x, y = s
+        # x, y = s
         possible_states = {}
-        if y != 0 and self.maze[y - 1][x] != 'X':  # UP?
-            possible_states['U'] = (x, y - 1)
-            print('U: ' + str(possible_states['U']))
-        if y != len(self.maze) - 1 and self.maze[y + 1][x] != 'X':  # DOWN
-            possible_states['D'] = (x, y + 1)
-            print('D: ' + str(possible_states['D']))
-        if x != 0 and self.maze[y][x - 1] != 'X':  # LEFT
-            possible_states['L'] = (x - 1, y)
-            print('L: ' + str(possible_states['L']))
-        if x != len(self.maze[0]) - 1 and self.maze[y][x + 1] != 'X':  # RIGHT
-            possible_states['R'] = (x + 1, y)
-            print('R: ' + str(possible_states['R']))
+        if s[1] != 0 and self.maze[s[1] - 1][s[0]] != 'X':  # UP?
+            possible_states['U'] = (s[0], s[1] - 1)
+        if s[1] != len(self.maze) - 1 and self.maze[s[1] + 1][s[0]] != 'X':  # DOWN
+            possible_states['D'] = (s[0], s[1] + 1)
+        if s[0] != 0 and self.maze[s[1]][s[0] - 1] != 'X':  # LEFT
+            possible_states['L'] = (s[0] - 1, s[1])
+        if s[0] != len(self.maze[0]) - 1 and self.maze[s[1]][s[0] + 1] != 'X':  # RIGHT
+            possible_states['R'] = (s[0] + 1, s[1])
         return possible_states
 
     # transitions returns a list of tuples in the format:
@@ -123,6 +120,7 @@ class MazeProblem:
                 return (-1, False)
         return (len(soln), self.goalTest(s))
 
+    # TODO: delete
     def print_maze(self, maze):
         print('  01234')
         print(f'0 {maze[0]}')
@@ -132,14 +130,15 @@ class MazeProblem:
         print(f'4 {maze[4]}')
 
 
+# NOTE: TESTS
 maze = ["XXXXX", "X..GX", "X...X", "X*..X", "XXXXX"]
 testMaze = MazeProblem(maze)
-print(f'Maze: {testMaze.maze}')
+# print(f'Maze: {testMaze.maze}')
 testMaze.print_maze(maze)
-print(f'Initial: {testMaze.initial}')
-print(f'Goals: {testMaze.goals}')
-# print(testMaze.goalTest(testMaze.goals[0]))
-print(testMaze.transitions(testMaze.initial))
-# mydict = {'U': (1, 0), 'D': (1, 2), 'L': (0, 1), 'R': (2, 1)}
-# mylist = [(k, v) for k, v in mydict.items()]
-# print(mylist)
+# print(f'Initial: {testMaze.initial}')
+# print(f'Goals: {testMaze.goals}')
+# print("goalTest(): " + str(testMaze.goalTest(testMaze.goals[0])))
+# print(testMaze.transitions(testMaze.initial))
+soln = ['U', 'U', 'R', 'R']
+print(f'Solution: {soln}')
+print(f'solnTest(): {testMaze.solnTest(soln)}')
