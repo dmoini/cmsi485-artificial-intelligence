@@ -65,8 +65,8 @@ class MazeProblem:
     # goalTest is parameterized by a state, and
     # returns True if the given state is a goal, False otherwise
     def goalTest(self, state):
-        # x, y = state
-        return self.maze[state[1]][state[0]] == "G"
+        return state in self.goals
+        # return self.maze[state[1]][state[0]] == "G"
 
     # returns dictionary where:
     # key is a string of format "DIRECTION"
