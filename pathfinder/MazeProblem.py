@@ -50,9 +50,7 @@ class MazeProblem:
     # Constructs a new pathfinding problem from a maze, described above
     def __init__(self, maze):
         self.maze = maze
-        # self.initial = [(y, x) for x, i in enumerate(maze) for y, j in enumerate(i) if j == "*"]
         self.initial = None
-        # self.goals = [(y, x) for x, i in enumerate(maze) for y, j in enumerate(i) if j == "G"]
         self.goals = []
 
         for y, line in enumerate(maze):
@@ -104,26 +102,3 @@ class MazeProblem:
             if self.maze[s[1]][s[0]] == "X":
                 return (-1, False)
         return (len(soln), self.goalTest(s))
-
-    # TODO: delete
-    def print_maze(self, maze):
-        print('  01234')
-        print(f'0 {maze[0]}')
-        print(f'1 {maze[1]}')
-        print(f'2 {maze[2]}')
-        print(f'3 {maze[3]}')
-        print(f'4 {maze[4]}')
-
-
-# NOTE: TESTS
-# maze = ["XXXXX", "X..GX", "X...X", "X*..X", "XXXXX"]
-# testMaze = MazeProblem(maze)
-# print(f'Maze: {testMaze.maze}')
-# testMaze.print_maze(maze)
-# print(f'Initial: {testMaze.initial}')
-# print(f'Goals: {testMaze.goals}')
-# print("goalTest(): " + str(testMaze.goalTest(testMaze.goals[0])))
-# print(testMaze.transitions(testMaze.initial))
-# soln = ['U', 'U', 'R', 'R']
-# print(f'Solution: {soln}')
-# print(f'solnTest(): {testMaze.solnTest(soln)}')
