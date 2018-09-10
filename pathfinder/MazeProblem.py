@@ -66,14 +66,12 @@ class MazeProblem:
     # returns True if the given state is a goal, False otherwise
     def goalTest(self, state):
         return state in self.goals
-        # return self.maze[state[1]][state[0]] == "G"
 
     # returns dictionary where:
     # key is a string of format "DIRECTION"
     # value is tuple of format (x, y)
     # each tuple is an available movement from the given state
     def possible_states(self, s):
-        # x, y = s
         possible_states = {}
         if s[1] != 0 and self.maze[s[1] - 1][s[0]] != 'X':  # UP?
             possible_states['U'] = (s[0], s[1] - 1)
@@ -92,19 +90,6 @@ class MazeProblem:
     def transitions(self, state):
         possible_states = self.possible_states(state)
         return [(k, v) for k, v in possible_states.items()]
-
-    # returns tuple of format (x, y) where returned tuple
-    # is the resulting state of a given action and a given state
-    # def result(self, action1, s):
-    #     if action1 == 'U':
-    #         return (s[0], s[1] - 1)
-    #     if action1 == 'D':
-    #         return (s[0], s[1] + 1)
-    #     if action1 == 'L':
-    #         return (s[0] - 1, s[1])
-    #     if action1 == 'R':
-    #         return (s[0] + 1, s[1])
-    #     return s  # if not possible states, return current state
 
     # solnTest will return a tuple of the format (cost, isSoln) where:
     # cost = the total cost of the solution,
@@ -131,14 +116,14 @@ class MazeProblem:
 
 
 # NOTE: TESTS
-maze = ["XXXXX", "X..GX", "X...X", "X*..X", "XXXXX"]
-testMaze = MazeProblem(maze)
+# maze = ["XXXXX", "X..GX", "X...X", "X*..X", "XXXXX"]
+# testMaze = MazeProblem(maze)
 # print(f'Maze: {testMaze.maze}')
-testMaze.print_maze(maze)
+# testMaze.print_maze(maze)
 # print(f'Initial: {testMaze.initial}')
 # print(f'Goals: {testMaze.goals}')
 # print("goalTest(): " + str(testMaze.goalTest(testMaze.goals[0])))
 # print(testMaze.transitions(testMaze.initial))
-soln = ['U', 'U', 'R', 'R']
-print(f'Solution: {soln}')
-print(f'solnTest(): {testMaze.solnTest(soln)}')
+# soln = ['U', 'U', 'R', 'R']
+# print(f'Solution: {soln}')
+# print(f'solnTest(): {testMaze.solnTest(soln)}')
