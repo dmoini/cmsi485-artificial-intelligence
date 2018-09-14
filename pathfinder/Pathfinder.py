@@ -41,7 +41,7 @@ class Pathfinder:
     def get_path(STN):
         path = []
         current = STN
-        while current.parent is not None:
+        while current.parent:
             path.append(current.action)
             current = current.parent
         return path[::-1]
@@ -49,7 +49,11 @@ class Pathfinder:
 
 class PathfinderTests(unittest.TestCase):
     def test_maze1(self):
-        maze = ['XXXXX', 'X..GX', 'X...X', 'X*..X', 'XXXXX']
+        maze = ["XXXXX",
+                "X..GX",
+                "X...X",
+                "X*..X",
+                "XXXXX"]
         problem = MazeProblem(maze)
         soln = Pathfinder.solve(problem)
         solnTest = problem.solnTest(soln)
@@ -57,7 +61,11 @@ class PathfinderTests(unittest.TestCase):
         self.assertEqual(solnTest[0], 4)
 
     def test_maze2(self):
-        maze = ['XXXXX', 'XG..X', 'XX..X', 'X*..X', 'XXXXX']
+        maze = ["XXXXX",
+                "XG..X",
+                "XX..X",
+                "X*..X",
+                "XXXXX"]
         problem = MazeProblem(maze)
         soln = Pathfinder.solve(problem)
         solnTest = problem.solnTest(soln)
@@ -65,22 +73,84 @@ class PathfinderTests(unittest.TestCase):
         self.assertEqual(solnTest[0], 4)
 
     def test_maze3(self):
-        maze = ['XXXXX', 'X*..X', 'XXX.X', 'XG..X', 'XXXXX']
+        maze = ["XXXXX",
+                "XG..X",
+                "XX..X",
+                "X*.GX",
+                "XXXXX"]
         problem = MazeProblem(maze)
         soln = Pathfinder.solve(problem)
         solnTest = problem.solnTest(soln)
         self.assertTrue(solnTest[1])
-        self.assertEqual(solnTest[0], 6)
+        self.assertEqual(solnTest[0], 2)
 
     def test_maze4(self):
-        maze = ['XXXXX', 'X*.XX', 'XX..X', 'XXXGX', 'XXXXX']
+        maze = ["XXXXXXX",
+                "X..*..X",
+                "XXX.XXX",
+                "X.....X",
+                "X.X.XGX",
+                "XXXXXXX"]
+        problem = MazeProblem(maze)
+        soln = Pathfinder.solve(problem)
+        solnTest = problem.solnTest(soln)
+        self.assertTrue(solnTest[1])
+        self.assertEqual(solnTest[0], 5)
+
+    def test_maze5(self):
+        maze = ["XXXXXXX",
+                "X..*..X",
+                "XXX.XXX",
+                "XG....X",
+                "X.X.XGX",
+                "XXXXXXX"]
         problem = MazeProblem(maze)
         soln = Pathfinder.solve(problem)
         solnTest = problem.solnTest(soln)
         self.assertTrue(solnTest[1])
         self.assertEqual(solnTest[0], 4)
 
-    # TODO: Add more unit tests!
+    def test_maze6(self):
+        maze = ["XXXXXXX",
+                "XGX...X",
+                "XXX...X",
+                "X..*..X",
+                "X.....X",
+                "X....GX",
+                "XXXXXXX"]
+        problem = MazeProblem(maze)
+        soln = Pathfinder.solve(problem)
+        solnTest = problem.solnTest(soln)
+        self.assertTrue(solnTest[1])
+        self.assertEqual(solnTest[0], 4)
+
+    def test_maze7(self):
+        maze = ["XXXXXXX",
+                "X..G..X",
+                "X.....X",
+                "X.G*.GX",
+                "X.....X",
+                "X..G..X",
+                "XXXXXXX"]
+        problem = MazeProblem(maze)
+        soln = Pathfinder.solve(problem)
+        solnTest = problem.solnTest(soln)
+        self.assertTrue(solnTest[1])
+        self.assertEqual(solnTest[0], 1)
+
+    def test_maze8(self):
+        maze = ["XXXXXXX",
+                "X*....X",
+                "XXXXX.X",
+                "X.....X",
+                "X.XXXXX",
+                "X....GX",
+                "XXXXXXX"]
+        problem = MazeProblem(maze)
+        soln = Pathfinder.solve(problem)
+        solnTest = problem.solnTest(soln)
+        self.assertTrue(solnTest[1])
+        self.assertEqual(solnTest[0], 16)
 
 
 if __name__ == '__main__':
