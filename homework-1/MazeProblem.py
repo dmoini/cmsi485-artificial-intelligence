@@ -46,7 +46,7 @@ into clear tiles (.), then the transitions for that s = (1, 1) would be:
 class MazeProblem:
     # Static costMap for maze components and the cost to move onto them
     # Any component not listed assumed to have a cost of 1
-    costMap = {"M": 3}
+    costMap = {'M': 3}
 
     # MazeProblem Constructor:
     # Constructs a new pathfinding problem from a maze, described above
@@ -59,8 +59,8 @@ class MazeProblem:
     # as the next state the action leads to
     def transitions(self, state):
         s = state
-        possible = [('U', (s[0], s[1]-1)), ('D', (s[0], s[1]+1)),
-                    ('L', (s[0]-1, s[1])), ('R', (s[0] + 1, s[1]))]
+        possible = [('U', (s[0], s[1] - 1)), ('D', (s[0], s[1] + 1)),
+                    ('L', (s[0] - 1, s[1])), ('R', (s[0] + 1, s[1]))]
         return [(s[0], self.cost(s[1]), s[1]) for s in possible if
                 self.maze[s[1][1]][s[1][0]] != 'X']
 
