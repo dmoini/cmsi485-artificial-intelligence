@@ -143,6 +143,20 @@ class PathfinderTests(unittest.TestCase):
         soln = solve(problem, initial, goals)
         self.assertTrue(soln)
 
+    def test_maze6(self):
+        maze = ["XXXXXXX",
+                "X.....X",
+                "X.....X",
+                "X.....X",
+                "XXXXXXX"]
+        problem = MazeProblem(maze)
+        initial = (3, 2)
+        goals = [(1, 1), (5, 1), (1, 3), (5, 3)]
+        soln = solve(problem, initial, goals)
+        (soln_cost, is_soln) = problem.soln_test(soln, initial, goals)
+        self.assertTrue(is_soln)
+        self.assertEqual(soln_cost, 11)
+
 
 if __name__ == '__main__':
     unittest.main()
