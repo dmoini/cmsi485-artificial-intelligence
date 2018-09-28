@@ -48,19 +48,20 @@ def create_path(goals):
     return [list(goal) for goal in goals]
 
 def solve(problem, initial, goals):
-    valid_goals = [g for g in goals if a_star_search(problem, initial, g) is not None]
-    goal_permutations = create_path(itertools.permutations(valid_goals))
-    optimal_solutions = PriorityQueue()
+    goal_permutations = create_path(itertools.permutations(goals))
+    solutions = PriorityQueue()
     for goal in goal_permutations:
         goal.insert(0, initial)
         paths = []
         total_heuristic_cost = 0
         for i in range(len(goal) - 1):
             solved = a_star_search(problem, goal[i], goal[i + 1])
+            if solved is None:
+                return None
             paths.extend(solved[0])
             total_heuristic_cost += solved[1]
-        optimal_solutions.put((total_heuristic_cost, paths))
-    return optimal_solutions.get()[1]
+        solutions.put((total_heuristic_cost, paths))
+    return solutions.get()[1]
 
 
 class PathfinderTests(unittest.TestCase):
@@ -130,7 +131,7 @@ class PathfinderTests(unittest.TestCase):
         initial = (5, 1)
         goals = [(5, 3), (1, 3), (1, 1)]
         soln = solve(problem, initial, goals)
-        self.assertTrue(soln)
+        self.assertTrue(soln is None)
 
     def test_maze6(self):
         maze = ["XXXXXXX",
@@ -156,7 +157,7 @@ class PathfinderTests(unittest.TestCase):
         initial = (3, 1)
         goals = [(3, 3), (5, 1)]
         soln = solve(problem, initial, goals)
-        self.assertTrue(soln)
+        self.assertTrue(soln is None)
 
 
 if __name__ == '__main__':
