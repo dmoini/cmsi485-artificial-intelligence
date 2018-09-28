@@ -13,12 +13,10 @@ from SearchTreeNode import SearchTreeNode
 import unittest
 from queue import PriorityQueue
 
-
 def get_heuristic_cost(a, b):
     (x1, y1) = a
     (x2, y2) = b
     return abs(x1 - x2) + abs(y1 - y2)
-
 
 def find_path(STN):
     path = []
@@ -28,49 +26,40 @@ def find_path(STN):
         current = current.parent
     return path[::-1]
 
-
-def reachable(problem, goal):
-    return len(problem.transitions(goal)) > 0
-
-
-def a_star(problem, initial, goal):
+def a_star_search(problem, initial, goal):
     q = PriorityQueue()
     q.put((0, SearchTreeNode(initial, None, None, 0, 0)))
     visited = set()
-    while q and reachable(problem, goal):
+    while not q.empty():
         current = q.get()[1]
         if current.state == goal:
             return (find_path(current), current.totalCost)
         for action, cost, state in problem.transitions(current.state):
-            new_cost = cost + current.totalCost
-            if current.state not in visited or new_cost < current.totalCost:
+            next_cost = cost + current.totalCost
+            if current.state not in visited or next_cost < current.totalCost:
                 heuristic_cost = get_heuristic_cost(state, goal)
-                priority = cost + current.totalCost + heuristic_cost
-                q.put((priority, SearchTreeNode(state, action, current, new_cost, heuristic_cost)))
+                total_heuristic_cost = cost + current.totalCost + heuristic_cost
+                q.put((total_heuristic_cost,
+                       SearchTreeNode(state, action, current, next_cost, heuristic_cost)))
         visited.add(current.state)
     return None
 
-
 def create_path(goals):
-    goal_list = []
-    for goal in goals:
-        goal_list.append(list(goal))
-    return goal_list
-
+    return [list(goal) for goal in goals]
 
 def solve(problem, initial, goals):
-    valid_goals = [g for g in goals if reachable(problem, g)]
+    valid_goals = [g for g in goals if a_star_search(problem, initial, g) is not None]
     goal_permutations = create_path(itertools.permutations(valid_goals))
     optimal_solutions = PriorityQueue()
     for goal in goal_permutations:
         goal.insert(0, initial)
         paths = []
-        priority = 0
+        total_heuristic_cost = 0
         for i in range(len(goal) - 1):
-            solved = a_star(problem, goal[i], goal[i + 1])
+            solved = a_star_search(problem, goal[i], goal[i + 1])
             paths.extend(solved[0])
-            priority += solved[1]
-        optimal_solutions.put((priority, paths))
+            total_heuristic_cost += solved[1]
+        optimal_solutions.put((total_heuristic_cost, paths))
     return optimal_solutions.get()[1]
 
 
@@ -156,6 +145,18 @@ class PathfinderTests(unittest.TestCase):
         (soln_cost, is_soln) = problem.soln_test(soln, initial, goals)
         self.assertTrue(is_soln)
         self.assertEqual(soln_cost, 11)
+
+    def test_maze7(self):
+        maze = ["XXXXXXX",
+                "X.....X",
+                "XXXXXXX",
+                "X.....X",
+                "XXXXXXX"]
+        problem = MazeProblem(maze)
+        initial = (3, 1)
+        goals = [(3, 3), (5, 1)]
+        soln = solve(problem, initial, goals)
+        self.assertTrue(soln)
 
 
 if __name__ == '__main__':
