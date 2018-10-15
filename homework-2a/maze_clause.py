@@ -19,13 +19,11 @@ class MazeClause:
         self.props = {}
         self.valid = False
         for p in props:
-            if p[0] in self.props and self.props[p[0]] != p[1]: #valid by construction
+            if p[0] in self.props and self.props[p[0]] != p[1]:  # valid by construction
                 self.valid = True
                 self.props.clear()
                 break
             self.props[p[0]] = p[1]
-
-
 
     def get_prop(self, prop):
         """
@@ -86,9 +84,6 @@ class MazeClause:
         inference engine)
         """
         results = set()
-        # TODO: This is currently implemented incorrectly; see
-        # spec for details!
-
         complement = -999999
         for key, value in c1.props.items():
             if key in c2.props and c2.props[key] != value:
@@ -96,11 +91,12 @@ class MazeClause:
                 break
         if complement != -999999:
             clauses = []
-            for (k1, v1), (k2, v2) in zip(c1.props.items(), c2.props.items()):
-                if k1 != complement:
-                    clauses.append((k1, v1))
-                if k2 != complement:
-                    clauses.append((k2, v2))
+            for k, v in c1.props.items():
+                if k != complement:
+                    clauses.append((k, v))
+            for k, v in c2.props.items():
+                if k != complement:
+                    clauses.append((k, v))
             c3 = MazeClause(clauses)
             if not c3.is_valid():
                 results.add(c3)
