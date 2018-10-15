@@ -14,12 +14,18 @@ class MazeClause:
         """
         Constructor parameterized by the propositions within this clause;
         argument props is a list of MazeClauses:
-        [("P", (1, 1)), ("B", (1, 2)), ...]
+        [(("X", (2, 1)), True), (("Y", (1, 2)), False), ...]
         """
         self.props = {}
         self.valid = False
-        # TODO: Process list of propositions to make a correctly
-        # formatted MazeClause
+        for p in props:
+            if p[0] in self.props and self.props[p[0]] != p[1]: #valid by construction
+                self.valid = True
+                self.props.clear()
+                break
+            self.props[p[0]] = p[1]
+
+
 
     def get_prop(self, prop):
         """
@@ -28,9 +34,7 @@ class MazeClause:
           - True if the requested prop is positive in the clause
           - False if the requested prop is negated in the clause
         """
-        # TODO: This is currently implemented incorrectly; see
-        # spec for details!
-        return False
+        return self.props[prop] if prop in self.props else None
 
     def is_valid(self):
         """
@@ -38,9 +42,7 @@ class MazeClause:
           - True if this clause is logically equivalent with True
           - False otherwise
         """
-        # TODO: This is currently implemented incorrectly; see
-        # spec for details!
-        return False
+        return self.valid
 
     def is_empty(self):
         """
@@ -49,9 +51,7 @@ class MazeClause:
           - False otherwise
         (NB: valid clauses are not empty)
         """
-        # TODO: This is currently implemented incorrectly; see
-        # spec for details!
-        return False
+        return len(self.props) == 0 and not self.valid
 
     def __eq__(self, other):
         """
@@ -71,8 +71,11 @@ class MazeClause:
     # Hint: Specify a __str__ method for ease of debugging (this
     # will allow you to "print" a MazeClause directly to inspect
     # its composite literals)
-    # def __str__ (self):
-    #     return ""
+    def __str__(self):
+        clauses = []
+        for key, value in self.props.items():
+            clauses.append(str((key, value)))
+        return ', '.join(clauses)
 
     @staticmethod
     def resolve(c1, c2):
@@ -85,6 +88,22 @@ class MazeClause:
         results = set()
         # TODO: This is currently implemented incorrectly; see
         # spec for details!
+
+        complement = -999999
+        for key, value in c1.props.items():
+            if key in c2.props and c2.props[key] != value:
+                complement = key
+                break
+        if complement != -999999:
+            clauses = []
+            for (k1, v1), (k2, v2) in zip(c1.props.items(), c2.props.items()):
+                if k1 != complement:
+                    clauses.append((k1, v1))
+                if k2 != complement:
+                    clauses.append((k2, v2))
+            c3 = MazeClause(clauses)
+            if not c3.is_valid():
+                results.add(c3)
         return results
 
 
