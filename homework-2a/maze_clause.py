@@ -84,19 +84,15 @@ class MazeClause:
         inference engine)
         """
         results = set()
-        complement = -999999
+        complement_key = None
         for key, value in c1.props.items():
             if key in c2.props and c2.props[key] != value:
-                complement = key
+                complement_key = key
                 break
-        if complement != -999999:
-            clauses = []
-            for k, v in c1.props.items():
-                if k != complement:
-                    clauses.append((k, v))
-            for k, v in c2.props.items():
-                if k != complement:
-                    clauses.append((k, v))
+        if complement_key:
+            clauses = list(c1.props.items() | c2.props.items())
+            clauses.remove((complement_key, True))
+            clauses.remove((complement_key, False))
             c3 = MazeClause(clauses)
             if not c3.is_valid():
                 results.add(c3)
