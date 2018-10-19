@@ -13,8 +13,8 @@ class MazeClause:
     def __init__(self, props):
         """
         Constructor parameterized by the propositions within this clause;
-        argument props is a list of MazeClauses:
-        [(("X", (2, 1)), True), (("Y", (1, 2)), False), ...]
+        argument props is a list of MazePropositions, like:
+        [(("X", (1, 1)), True), (("X", (2, 1)), True), (("Y", (1, 2)), False)]
         """
         self.props = {}
         self.valid = False
