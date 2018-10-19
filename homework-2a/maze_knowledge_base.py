@@ -34,8 +34,8 @@ class MazeKnowledgeBase:
         negated_query = self.negate(query)
         clauses = self.clauses.add(query)
         new_clauses = set()
-        for clause in self.clauses:
-            resolvent = m
+        # for clause in self.clauses:
+        #     resolvent = m
 
         return False
 
