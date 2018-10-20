@@ -31,14 +31,14 @@ class MazeKnowledgeBase:
         # This is currently implemented incorrectly; see
         # spec for details!
         # self = KB, query = α
-        negated_query = self.negate(query) #DON'T ADD NEGATED QUERY
+        negated_query = self.negated(query) #DON'T ADD NEGATED QUERY
         new_clauses = set()
         # for clause in self.clauses:
         #     resolvent = m
 
         return False
 
-    def negate(self, clause):
+    def negated(self, clause):
         props = clause.props
         negated_clauses = set()
         for k, v in props.items():
@@ -48,7 +48,7 @@ class MazeKnowledgeBase:
 
 
 kb = MazeKnowledgeBase()
-clauses = kb.negate(MazeClause([(("Z", (1, 1)), True), (("W", (1, 1)), True)]))
+clauses = kb.negated(MazeClause([(("Z", (1, 1)), True), (("W", (1, 1)), True)]))
 for c in clauses:
     print(str(c))
 
