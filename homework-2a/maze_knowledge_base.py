@@ -31,8 +31,7 @@ class MazeKnowledgeBase:
         # This is currently implemented incorrectly; see
         # spec for details!
         # self = KB, query = α
-        negated_query = self.negate(query)
-        clauses = self.clauses.add(query)
+        negated_query = self.negate(query) #DON'T ADD NEGATED QUERY
         new_clauses = set()
         # for clause in self.clauses:
         #     resolvent = m
