@@ -1,106 +1,168 @@
 '''
-Ian Lizarda
-Donovan Moini
-maze_knowledge_base.py
+maze_clause.py
 
-Specifies a simple, Conjunctive Normal Form Propositional
-Logic Knowledge Base for use in Grid Maze pathfinding problems
-with side-information.
+Specifies a Propositional Logic Clause formatted specifically
+for Grid Maze Pathfinding problems. Clauses are a disjunction of
+MazePropositions (2-tuples of (symbol, location)) mapped to
+their negated status in the sentence.
 '''
-from maze_clause import MazeClause
-from itertools import combinations
-from copy import deepcopy
 import unittest
 
-class MazeKnowledgeBase:
-    def __init__(self):
-        self.clauses = set()
+class MazeClause:
 
-    def tell(self, clause):
+    def __init__(self, props):
         """
-        Adds the given clause to the CNF MazeKnowledgeBase
-        Note: we expect that no clause added this way will ever
-        make the KB inconsistent (you need not check for this)
+        Constructor parameterized by the propositions within this clause;
+        argument props is a list of MazePropositions, like:
+        [(("X", (1, 1)), True), (("X", (2, 1)), True), (("Y", (1, 2)), False)]
         """
-        self.clauses.add(clause)
+        self.props = {}
+        self.valid = False
+        for p in props:
+            if p[0] in self.props and self.props[p[0]] != p[1]:  # valid by construction
+                self.valid = True
+                self.props.clear()
+                break
+            self.props[p[0]] = p[1]
 
-    def ask(self, query):
+    def get_prop(self, prop):
         """
-        Given a MazeClause query, returns True if the KB entails
-        the query, False otherwise
+        Returns:
+          - None if the requested prop is not in the clause
+          - True if the requested prop is positive in the clause
+          - False if the requested prop is negated in the clause
         """
-        empty_clause = MazeClause([])
-        copy_clauses = deepcopy(self.clauses)
-        copy_clauses.update(self.negated(query))
-        new_clauses = set()
-        while True:
-            for clause in combinations(copy_clauses, 2):
-                resolvents = query.resolve(*clause)
-                if empty_clause in resolvents:
-                    return True                                        
-                new_clauses = (new_clauses | resolvents)
-            if new_clauses.issubset(copy_clauses):
-                return False
-            copy_clauses = (copy_clauses | new_clauses)
-        
+        return self.props[prop] if prop in self.props else None
 
-    def negated(self, clause):
-        props = clause.props
-        negated_clauses = []
-        for k, v in props.items():
-            negated_clauses.append(MazeClause([(k, not v)]))
-        return negated_clauses
+    def is_valid(self):
+        """
+        Returns:
+          - True if this clause is logically equivalent with True
+          - False otherwise
+        """
+        return self.valid
+
+    def is_empty(self):
+        """
+        Returns:
+          - True if this is the Empty Clause
+          - False otherwise
+        (NB: valid clauses are not empty)
+        """
+        return len(self.props) == 0 and not self.valid
+
+    def __eq__(self, other):
+        """
+        Defines equality comparator between MazeClauses: only if they
+        have the same props (in any order) or are both valid
+        """
+        return self.props == other.props and self.valid == other.valid
+
+    def __hash__(self):
+        """
+        Provides a hash for a MazeClause to enable set membership
+        """
+        # Hashes an immutable set of the stored props for ease of
+        # lookup in a set
+        return hash(frozenset(self.props.items()))
+
+    # Hint: Specify a __str__ method for ease of debugging (this
+    # will allow you to "print" a MazeClause directly to inspect
+    # its composite literals)
+    def __str__(self):
+        clauses = []
+        for key, value in self.props.items():
+            clauses.append(str((key, value)))
+        return ', '.join(clauses)
+
+    @staticmethod
+    def resolve(c1, c2):
+        """
+        Returns a set of MazeClauses that are the result of resolving
+        two input clauses c1, c2 (Hint: result will only ever be a set
+        of 0 or 1 MazeClause, but it being a set is convenient for the
+        inference engine)
+        """
+        results = set()
+        complement_key = None
+        for key, value in c1.props.items():
+            if key in c2.props and c2.props[key] != value:
+                complement_key = key
+                break
+        if complement_key:
+            clauses = list(c1.props.items() | c2.props.items())
+            clauses.remove((complement_key, True))
+            clauses.remove((complement_key, False))
+            c3 = MazeClause(clauses)
+            if not c3.is_valid():
+                results.add(c3)
+        return results
 
 
-class MazeKnowledgeBaseTests(unittest.TestCase):
-    def test_mazekb1(self):
-        kb = MazeKnowledgeBase()
-        kb.tell(MazeClause([(("X", (1, 1)), True)]))
-        self.assertTrue(kb.ask(MazeClause([(("X", (1, 1)), True)])))
+class MazeClauseTests(unittest.TestCase):
+    def test_mazeprops1(self):
+        mc = MazeClause([(("X", (1, 1)), True), (("X", (2, 1)), True), (("Y", (1, 2)), False)])
+        self.assertTrue(mc.get_prop(("X", (1, 1))))
+        self.assertTrue(mc.get_prop(("X", (2, 1))))
+        self.assertFalse(mc.get_prop(("Y", (1, 2))))
+        self.assertTrue(mc.get_prop(("X", (2, 2))) is None)
+        self.assertFalse(mc.is_empty())
 
-    def test_mazekb2(self):
-        kb = MazeKnowledgeBase()
-        kb.tell(MazeClause([(("X", (1, 1)), False)]))
-        kb.tell(MazeClause([(("X", (1, 1)), True), (("Y", (1, 1)), True)]))
-        self.assertTrue(kb.ask(MazeClause([(("Y", (1, 1)), True)])))
+    def test_mazeprops2(self):
+        mc = MazeClause([(("X", (1, 1)), True), (("X", (1, 1)), True)])
+        self.assertTrue(mc.get_prop(("X", (1, 1))))
+        self.assertFalse(mc.is_empty())
 
-    def test_mazekb3(self):
-        kb = MazeKnowledgeBase()
-        kb.tell(MazeClause([(("X", (1, 1)), False), (("Y", (1, 1)), True)]))
-        kb.tell(MazeClause([(("Y", (1, 1)), False), (("Z", (1, 1)), True)]))
-        kb.tell(MazeClause([(("W", (1, 1)), True), (("Z", (1, 1)), False)]))
-        kb.tell(MazeClause([(("X", (1, 1)), True)]))
-        self.assertTrue(kb.ask(MazeClause([(("W", (1, 1)), True)])))
-        self.assertFalse(kb.ask(MazeClause([(("Y", (1, 1)), False)])))
+    def test_mazeprops3(self):
+        mc = MazeClause([(("X", (1, 1)), True), (("Y", (2, 1)), True), (("X", (1, 1)), False)])
+        self.assertTrue(mc.is_valid())
+        self.assertTrue(mc.get_prop(("X", (1, 1))) is None)
+        self.assertFalse(mc.is_empty())
 
-    def test_mazekb4(self):
-        kb = MazeKnowledgeBase()
-        kb.tell(MazeClause([(("X", (1, 1)), False), (("Y", (1, 1)), True), (("W", (1, 1)), True)]))
-        kb.tell(MazeClause([(("W", (1, 1)), False), (("Z", (1, 1)), False), (("S", (1, 1)), True)]))
-        kb.tell(MazeClause([(("S", (1, 1)), False), (("T", (1, 1)), False)]))
-        kb.tell(MazeClause([(("X", (1, 1)), True), (("T", (1, 1)), True)]))
-        kb.tell(MazeClause([(("W", (1, 1)), True)]))
-        kb.tell(MazeClause([(("T", (1, 1)), True)]))
-        self.assertTrue(kb.ask(MazeClause([(("Z", (1, 1)), False)])))
+    def test_mazeprops4(self):
+        mc = MazeClause([])
+        self.assertFalse(mc.is_valid())
+        self.assertTrue(mc.is_empty())
 
-    def test_mazekb5(self):
-        kb = MazeKnowledgeBase()
-        kb.tell(MazeClause([(("X", (1, 1)), False), (("Y", (1, 1)), True), (("W", (1, 1)), True)]))
-        kb.tell(MazeClause([(("W", (1, 1)), False), (("Z", (1, 1)), False), (("S", (1, 1)), True)]))
-        kb.tell(MazeClause([(("S", (1, 1)), False), (("T", (1, 1)), False)]))
-        kb.tell(MazeClause([(("X", (1, 1)), True), (("T", (1, 1)), True)]))
-        kb.tell(MazeClause([(("W", (1, 1)), True)]))
-        kb.tell(MazeClause([(("T", (1, 1)), True)]))
-        self.assertTrue(kb.ask(MazeClause([(("Z", (1, 1)), True), (("W", (1, 1)), True)])))
+    def test_mazeprops5(self):
+        mc1 = MazeClause([(("X", (1, 1)), True)])
+        mc2 = MazeClause([(("X", (1, 1)), True)])
+        res = MazeClause.resolve(mc1, mc2)
+        self.assertEqual(len(res), 0)
 
-    def test_mazekb6(self):
-        kb = MazeKnowledgeBase()
-        kb.tell(MazeClause([(("X", (1, 1)), False), (("Y", (1, 1)), False),
-                            (("Z", (1, 1)), False)]))
-        kb.tell(MazeClause([(("X", (1, 1)), True)]))
-        self.assertFalse(kb.ask(MazeClause([(("Z", (1, 1)), False)])))
-        kb.tell(MazeClause([(("Y", (1, 1)), True)]))
-        self.assertTrue(kb.ask(MazeClause([(("Z", (1, 1)), False)])))
+    def test_mazeprops6(self):
+        mc1 = MazeClause([(("X", (1, 1)), True)])
+        mc2 = MazeClause([(("X", (1, 1)), False)])
+        res = MazeClause.resolve(mc1, mc2)
+        self.assertEqual(len(res), 1)
+        self.assertTrue(MazeClause([]) in res)
+
+    def test_mazeprops7(self):
+        mc1 = MazeClause([(("X", (1, 1)), True), (("Y", (1, 1)), True)])
+        mc2 = MazeClause([(("X", (1, 1)), False), (("Y", (2, 2)), True)])
+        res = MazeClause.resolve(mc1, mc2)
+        self.assertEqual(len(res), 1)
+        self.assertTrue(MazeClause([(("Y", (1, 1)), True), (("Y", (2, 2)), True)]) in res)
+
+    def test_mazeprops8(self):
+        mc1 = MazeClause([(("X", (1, 1)), True), (("Y", (1, 1)), False)])
+        mc2 = MazeClause([(("X", (1, 1)), False), (("Y", (1, 1)), True)])
+        res = MazeClause.resolve(mc1, mc2)
+        self.assertEqual(len(res), 0)
+
+    def test_mazeprops9(self):
+        mc1 = MazeClause([(("X", (1, 1)), True), (("Y", (1, 1)), False), (("Z", (1, 1)), True)])
+        mc2 = MazeClause([(("X", (1, 1)), False), (("Y", (1, 1)), True), (("W", (1, 1)), False)])
+        res = MazeClause.resolve(mc1, mc2)
+        self.assertEqual(len(res), 0)
+
+    def test_mazeprops10(self):
+        mc1 = MazeClause([(("X", (1, 1)), True), (("Y", (1, 1)), False), (("Z", (1, 1)), True)])
+        mc2 = MazeClause([(("X", (1, 1)), False), (("Y", (1, 1)), False), (("W", (1, 1)), False)])
+        res = MazeClause.resolve(mc1, mc2)
+        self.assertEqual(len(res), 1)
+        self.assertTrue(MazeClause([(("Y", (1, 1)), False), (("Z", (1, 1)), True),
+                                    (("W", (1, 1)), False)]) in res)
 
 
 if __name__ == "__main__":
