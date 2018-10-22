@@ -1,4 +1,6 @@
 '''
+Ian Lizarda
+Donovan Moini
 maze_clause.py
 
 Specifies a Propositional Logic Clause formatted specifically

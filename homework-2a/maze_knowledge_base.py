@@ -1,4 +1,6 @@
 '''
+Ian Lizarda
+Donovan Moini
 maze_knowledge_base.py
 
 Specifies a simple, Conjunctive Normal Form Propositional
