@@ -18,7 +18,7 @@ class MazeAgent:
         # [!] TODO: Initialize any other knowledge-related attributes for
         # agent here
 
-    # [!] TODO! Agent currently just runs straight up
+    # [!] TODO: Agent currently just runs straight up
     def think(self, perception):
         """
         think is parameterized by the agent's perception of the tile type
