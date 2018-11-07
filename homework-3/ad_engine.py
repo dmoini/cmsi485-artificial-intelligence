@@ -60,7 +60,7 @@ class AdEngine:
 class AdEngineTests(unittest.TestCase):
     def test_defendotron_ad_engine(self):
         engine = AdEngine(
-            data_file = 'hw4_data.csv',
+            data_file = 'hw3_data.csv',
             dec_vars = ["Ad1", "Ad2"],
             # TODO: Current structure is blank; you need to fill this in using
             # the results from the Tetrad analysis!
