@@ -40,7 +40,7 @@ class AdEngine:
 
     def __init__(self, data_file, structure, dec_vars, util_map):
         self.data_file = data_file
-        data = np.genfromtxt(data_file, names=True, delimiter=',')
+        data = np.genfromtxt(data_file, dtype=int, names=True, delimiter=',')
         self.names = data.dtype.names
         self.network = BayesianNetwork.from_structure(data.view((int, len(self.names))), structure, state_names=self.names)
         self.dec_vars = dec_vars
@@ -88,12 +88,8 @@ class AdEngineTests(unittest.TestCase):
             # video (Ad1); our engine's results should adapt accordingly (see
             # tests below)
             dec_vars = ["Ad1"],
-            # TODO: Current structure is blank; you need to fill this in using
-            # the results from the Tetrad analysis!
-            structure = (),
-            # TODO: Decide what the utility map should be for the Defendotron
-            # example; see format of util_map in spec and above!
-            util_map = {}
+            structure = ((), (), (0, 9,), (6,), (0, 1,), (1, 8,), (), (2, 5,), (), ()),
+            util_map = {'S': {0: 0, 1: 5000, 2: 17760}}
         )
         self.assertEqual(engine.decide({"A": 1}), {"Ad1": 0})
         self.assertEqual(engine.decide({"P": 1, "A": 0}), {"Ad1": 1})
