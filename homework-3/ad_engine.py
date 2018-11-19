@@ -39,7 +39,6 @@ class AdEngine:
     """
 
     def __init__(self, data_file, structure, dec_vars, util_map):
-        self.data_file = data_file
         data = np.genfromtxt(data_file, dtype=int, names=True, delimiter=',')
         self.names = data.dtype.names
         self.network = BayesianNetwork.from_structure(data.view((int, len(self.names))), structure, state_names=self.names)
@@ -62,9 +61,26 @@ class AdEngine:
         best_combo, best_util = None, -math.inf
         # TODO: Rest of the implementation goes here!
         # print(evidence)
-        cpts = self.network.predict_proba(evidence)
-        print(len(cpts))
-        print(cpts)
+
+        print('\n------------------------------------------------------------------------------------------------------')
+        # predict_proba output = For all Vi c V
+        cpts = self.network.predict_proba(evidence)  # P(Vi | B)
+        # print(cpts)
+        # new_evidence = {}
+        # predict_proba()
+        # print(len(cpts))
+        util_index = self.names.index(list(self.util_map.keys())[0])
+        print(util_index)
+        new_evidence = {'Ad1': 0, 'Ad2': 0}
+        new_evidence.update(evidence)
+        print(new_evidence)
+        util_possibilities = cpts[util_index].parameters[0]
+        print(util_possibilities)
+        total_sum = 0
+        for u in util_possibilities.keys():
+            new_cpts = self.network.predict_proba(new_evidence)
+            total_sum += new_cpts[util_index].parameters[u] * self.util_map[u]
+        print(f'Total sum: {total_sum}')
         return best_combo
 
 
@@ -72,12 +88,12 @@ class AdEngineTests(unittest.TestCase):
     def test_defendotron_ad_engine_t1(self):
         engine = AdEngine(
             data_file = 'hw3_data.csv',
-            dec_vars = ["Ad1", "Ad2"],
+            dec_vars = ['Ad1', 'Ad2'],
             #            P   A   G        I     T        F        H   S        Ad2 Ad1
             structure = ((), (), (0, 9,), (6,), (0, 1,), (1, 8,), (), (2, 5,), (), ()),
             util_map = {'S': {0: 0, 1: 5000, 2: 17760}}
         )
-        self.assertEqual(engine.decide({"G": 0}), {"Ad1": 0, "Ad2": 1})
+        self.assertEqual(engine.decide({'G': 0}), {'Ad1': 0, "Ad2": 1})
         self.assertEqual(engine.decide({"F": 1}), {"Ad1": 1, "Ad2": 0})
         self.assertEqual(engine.decide({"G": 1, "T": 0}), {"Ad1": 1, "Ad2": 1})
         
