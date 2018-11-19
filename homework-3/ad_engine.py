@@ -43,8 +43,8 @@ class AdEngine:
         self.names = data.dtype.names
         self.network = BayesianNetwork.from_structure(data.view((int, len(self.names))), structure, state_names=self.names)
         self.dec_vars = dec_vars
-        # dictionary with all decisions and tuple of possibilities to find all possibilities
-        self.structure = structure #TUPLE of TUPLES
+        self.dec_vars_values = [list(np.unique(data[v])) for v in dec_vars]
+        self.structure = structure
         self.util_map = util_map
         
     def decide(self, evidence):
@@ -59,28 +59,20 @@ class AdEngine:
         :return: dict of format: {"DecVar1": val1, "DecVar2": val2, ...}
         """
         best_combo, best_util = None, -math.inf
-        # TODO: Rest of the implementation goes here!
-        # print(evidence)
-
-        print('\n------------------------------------------------------------------------------------------------------')
-        # predict_proba output = For all Vi c V
-        cpts = self.network.predict_proba(evidence)  # P(Vi | B)
-        # print(cpts)
-        # new_evidence = {}
-        # predict_proba()
-        # print(len(cpts))
-        util_index = self.names.index(list(self.util_map.keys())[0])
-        print(util_index)
-        new_evidence = {'Ad1': 0, 'Ad2': 0}
-        new_evidence.update(evidence)
-        print(new_evidence)
-        util_possibilities = cpts[util_index].parameters[0]
-        print(util_possibilities)
-        total_sum = 0
-        for u in util_possibilities.keys():
+        possible_combos = itertools.product(*self.dec_vars_values)
+        for combo in possible_combos:
+            cpts = self.network.predict_proba(evidence)
+            util_key = list(self.util_map.keys())[0]
+            util_index = self.names.index(util_key)
+            dec_dict = {d: combo[i] for i, d in enumerate(self.dec_vars)}
+            new_evidence = {**dec_dict, **evidence}
             new_cpts = self.network.predict_proba(new_evidence)
-            total_sum += new_cpts[util_index].parameters[u] * self.util_map[u]
-        print(f'Total sum: {total_sum}')
+            util = 0
+            for u in cpts[util_index].parameters[0].keys():
+                util += new_cpts[util_index].parameters[0][u] * self.util_map[util_key][u]
+            if util > best_util:
+                best_combo = dec_dict
+                best_util = util
         return best_combo
 
 
@@ -94,8 +86,8 @@ class AdEngineTests(unittest.TestCase):
             util_map = {'S': {0: 0, 1: 5000, 2: 17760}}
         )
         self.assertEqual(engine.decide({'G': 0}), {'Ad1': 0, "Ad2": 1})
-        self.assertEqual(engine.decide({"F": 1}), {"Ad1": 1, "Ad2": 0})
-        self.assertEqual(engine.decide({"G": 1, "T": 0}), {"Ad1": 1, "Ad2": 1})
+        self.assertEqual(engine.decide({'F': 1}), {'Ad1': 1, 'Ad2': 0})
+        self.assertEqual(engine.decide({'G': 1, 'T': 0}), {'Ad1': 1, 'Ad2': 1})
         
     def test_defendotron_ad_engine_t2(self):
         engine = AdEngine(
@@ -103,14 +95,14 @@ class AdEngineTests(unittest.TestCase):
             # [!] Note: in this example, say we are only deciding upon the ad
             # video (Ad1); our engine's results should adapt accordingly (see
             # tests below)
-            dec_vars = ["Ad1"],
+            dec_vars = ['Ad1'],
             structure = ((), (), (0, 9,), (6,), (0, 1,), (1, 8,), (), (2, 5,), (), ()),
             util_map = {'S': {0: 0, 1: 5000, 2: 17760}}
         )
-        self.assertEqual(engine.decide({"A": 1}), {"Ad1": 0})
-        self.assertEqual(engine.decide({"P": 1, "A": 0}), {"Ad1": 1})
-        self.assertEqual(engine.decide({"A": 1, "G": 1, "T": 1}), {"Ad1": 0})
+        self.assertEqual(engine.decide({'A': 1}), {'Ad1': 0})
+        self.assertEqual(engine.decide({'P': 1, 'A': 0}), {'Ad1': 1})
+        self.assertEqual(engine.decide({'A': 1, 'G': 1, 'T': 1}), {'Ad1': 0})
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
     
