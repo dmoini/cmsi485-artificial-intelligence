@@ -23,9 +23,7 @@ def preprocess(training, test):
          ("work/edu", OrdinalEncoder(), [1, 2]),
          ("edu-num", KBinsDiscretizer(n_bins=5, encode='ordinal', strategy='kmeans'), [3]),
          ("mar/occ/rel/race/sex", OrdinalEncoder(), [4, 5, 6, 7, 8]),
-         ("cg", KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='kmeans'), [9]),
-         ("cl", KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='kmeans'), [10]),
-         ("hrs", KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='kmeans'), [11]),
+         ("cg/cl/hrs", KBinsDiscretizer(n_bins=[3, 3, 3], encode='ordinal', strategy='kmeans'), [9, 10, 11]),
          ("nat", OrdinalEncoder(), [12])], remainder='passthrough').fit(imp_training)
     ct_training = ct.transform(imp_training)
     ct_test = ct.transform(imp_test)
