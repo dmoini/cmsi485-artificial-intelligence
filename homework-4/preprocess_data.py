@@ -9,7 +9,6 @@ from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.preprocessing import OrdinalEncoder
 
-
 def preprocess(training, test):
     training_data = stripQuotes(np.genfromtxt(training, dtype=str, delimiter=','))
     test_data = stripQuotes(np.genfromtxt(test, dtype=str, delimiter=','))
