@@ -1,3 +1,5 @@
+# Donovan Moini, Ian Lizarda, Tyler Edmiston
+
 import preprocess_data
 from sklearn.naive_bayes import MultinomialNB
 

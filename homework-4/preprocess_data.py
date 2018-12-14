@@ -1,3 +1,5 @@
+# Donovan Moini, Ian Lizarda, Tyler Edmiston
+
 from sklearn import preprocessing
 from sklearn.impute import SimpleImputer, MissingIndicator
 import numpy as np
